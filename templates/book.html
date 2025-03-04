@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ book.title }} - 小说网站{% endblock %}
+
+{% block styles %}
+<style>
+    .book-detail {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .book-header {
+        display: flex;
+        gap: 40px;
+        margin-bottom: 40px;
+    }
+    .book-cover {
+        width: 240px;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    .book-info {
+        flex: 1;
+    }
+    .book-title {
+        margin: 0 0 15px;
+        font-size: 28px;
+        color: var(--text-color);
+        font-weight: bold;
+    }
+    .book-author {
+        margin: 0 0 25px;
+        color: var(--text-light);
+        font-size: 16px;
+    }
+    .book-description {
+        color: var(--text-light);
+        line-height: 1.8;
+        font-size: 15px;
+        margin-bottom: 25px;
+        background: var(--bg-color);
+        padding: 20px;
+        border-radius: 8px;
+    }
+    .book-stats {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+    .stat-item {
+        color: var(--text-light);
+        font-size: 14px;
+    }
+    .chapters-section {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .section-title {
+        font-size: 20px;
+        color: var(--text-color);
+        margin: 0 0 20px;
+        padding-left: 12px;
+        border-left: 4px solid var(--primary-color);
+    }
+    .chapters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 15px;
+    }
+    .chapter-link {
+        display: block;
+        padding: 12px 15px;
+        background-color: var(--bg-color);
+        border-radius: 6px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .chapter-link:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="book-detail">
+    <div class="book-header">
+        <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
+        <div class="book-info">
+            <h1 class="book-title">{{ book.title }}</h1>
+            <p class="book-author">作者：{{ book.author }}</p>
+            <div class="book-stats">
+                <span class="stat-item">字数：{{ book.word_count|default('未知') }}</span>
+                <span class="stat-item">状态：{{ book.status|default('连载中') }}</span>
+                <span class="stat-item">更新：{{ book.last_update|default('未知') }}</span>
+            </div>
+            <div class="book-description">{{ book.description|default('暂无简介') }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="chapters-section">
+    <h2 class="section-title">章节列表</h2>
+    <div class="chapters-grid">
+        {% for chapter in chapters %}
+        <a href="/book/{{ book.id }}/chapter/{{ chapter.id }}" class="chapter-link">{{ chapter.title }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

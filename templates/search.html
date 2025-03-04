@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+
+{% block title %}搜索结果 - 小说网站{% endblock %}
+
+{% block styles %}
+<style>
+    .search-header {
+        margin-bottom: 20px;
+    }
+    .search-query {
+        color: #666;
+    }
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 20px 0;
+    }
+    .book-card {
+        background: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    .book-card:hover {
+        transform: translateY(-5px);
+    }
+    .book-cover {
+        width: 100%;
+        height: 280px;
+        object-fit: cover;
+        border-radius: 5px 5px 0 0;
+        background-color: #eee;
+    }
+    .book-info {
+        padding: 15px;
+    }
+    .book-title {
+        margin: 0;
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #333;
+    }
+    .book-author {
+        margin: 5px 0 0;
+        color: #666;
+        font-size: 0.9em;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="search-header">
+    <h1>搜索结果：<span class="search-query">{{ query }}</span></h1>
+</div>
+
+<div class="books-grid">
+    {% for book in books %}
+    <a href="/book/{{ book.id }}" class="book-card">
+        <img src="{{ book.cover }}" alt="{{ book.title }}" class="book-cover">
+        <div class="book-info">
+            <h3 class="book-title">{{ book.title }}</h3>
+            <p class="book-author">{{ book.author }}</p>
+        </div>
+    </a>
+    {% else %}
+    <p>未找到相关书籍</p>
+    {% endfor %}
+</div>
+{% endblock %}

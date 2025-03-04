@@ -1,0 +1,226 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ chapter.title }} - {{ book.title }} - 小说网站{% endblock %}
+
+{% block styles %}
+<style>
+    .chapter-container {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        margin-top: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        max-width: 920px;
+        margin: 20px auto;
+    }
+    .chapter-header {
+        margin-bottom: 40px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-color);
+        text-align: center;
+    }
+    .book-title {
+        margin: 0;
+        font-size: 16px;
+        color: var(--text-light);
+    }
+    .chapter-title {
+        margin: 15px 0 0;
+        font-size: 24px;
+        color: var(--text-color);
+        font-weight: bold;
+    }
+    .chapter-content {
+        line-height: 1.8;
+        font-size: 18px;
+        color: var(--text-color);
+        letter-spacing: 0.5px;
+    }
+    .chapter-content p {
+        margin: 1em 0;
+        text-indent: 2em;
+    }
+    .chapter-navigation {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 50px;
+        padding-top: 30px;
+        border-top: 1px solid var(--border-color);
+    }
+    .nav-button {
+        padding: 12px 25px;
+        background-color: var(--bg-color);
+        border-radius: 6px;
+        color: var(--text-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 15px;
+    }
+    .nav-button:hover {
+        background-color: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+    .reading-settings {
+        position: fixed;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .setting-button {
+        padding: 8px;
+        background: var(--bg-color);
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+    .setting-button:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+    body.dark-theme {
+        --bg-color: #1a1a1a;
+        --text-color: #e0e0e0;
+        --text-light: #a0a0a0;
+        --border-color: #333;
+    }
+    body.dark-theme .chapter-container,
+    body.dark-theme .reading-settings {
+        background: #242424;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chapter-container">
+    <div class="chapter-header">
+        <h2 class="book-title">{{ book.title }}</h2>
+        <h1 class="chapter-title">{{ chapter.title }}</h1>
+    </div>
+
+    <div class="chapter-content">
+        {% for paragraph in content.split('\n') %}
+        <p>{{ paragraph }}</p>
+        {% endfor %}
+    </div>
+
+    <div class="chapter-navigation">
+        <a href="/book/{{ book.id }}" class="nav-button">返回目录</a>
+        <div>
+            {% if prev_chapter %}
+            <a href="/book/{{ book.id }}/chapter/{{ prev_chapter.id }}" class="nav-button">上一章</a>
+            {% endif %}
+            {% if next_chapter %}
+            <a href="/book/{{ book.id }}/chapter/{{ next_chapter.id }}" class="nav-button">下一章</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="reading-settings">
+    <button class="setting-button" id="increaseFontSize" title="增大字号">A+</button>
+    <button class="setting-button" id="decreaseFontSize" title="减小字号">A-</button>
+    <button class="setting-button" id="toggleTheme" title="切换主题">☀</button>
+</div>
+
+<script>
+    // 字体大小调节
+    const content = document.querySelector('.chapter-content');
+    let fontSize = 18;
+    
+    document.getElementById('increaseFontSize').addEventListener('click', () => {
+        if (fontSize < 24) {
+            fontSize += 2;
+            content.style.fontSize = fontSize + 'px';
+            localStorage.setItem('fontSize', fontSize);
+        }
+    });
+    
+    document.getElementById('decreaseFontSize').addEventListener('click', () => {
+        if (fontSize > 14) {
+            fontSize -= 2;
+            content.style.fontSize = fontSize + 'px';
+            localStorage.setItem('fontSize', fontSize);
+        }
+    });
+    
+    // 主题切换
+    const toggleTheme = document.getElementById('toggleTheme');
+    let isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+    
+    if (isDarkTheme) {
+        document.body.classList.add('dark-theme');
+        toggleTheme.textContent = '☾';
+    }
+    
+    toggleTheme.addEventListener('click', () => {
+        isDarkTheme = !isDarkTheme;
+        document.body.classList.toggle('dark-theme');
+        toggleTheme.textContent = isDarkTheme ? '☾' : '☀';
+        localStorage.setItem('darkTheme', isDarkTheme);
+    });
+    
+    // 记录阅读进度
+    const saveReadingProgress = () => {
+        const recentReads = JSON.parse(localStorage.getItem('recentReads') || '[]');
+        const currentBook = {
+            id: {{ book.id }},
+            title: '{{ book.title }}',
+            chapterId: {{ chapter.id }},
+            chapterTitle: '{{ chapter.title }}',
+            timestamp: new Date().toISOString()
+        };
+        
+        // 移除相同书籍的旧记录
+        const updatedReads = recentReads.filter(book => book.id !== currentBook.id);
+        
+        // 添加新记录到开头
+        updatedReads.unshift(currentBook);
+        
+        // 只保留最近10条记录
+        if (updatedReads.length > 10) {
+            updatedReads.pop();
+        }
+        
+        localStorage.setItem('recentReads', JSON.stringify(updatedReads));
+    };
+    
+    // 页面加载时保存阅读进度
+    saveReadingProgress();
+    const themeButton = document.getElementById('toggleTheme');
+    const body = document.body;
+    
+    themeButton.addEventListener('click', () => {
+        body.classList.toggle('dark-theme');
+        const isDark = body.classList.contains('dark-theme');
+        localStorage.setItem('darkTheme', isDark);
+        themeButton.textContent = isDark ? '☀' : '☾';
+    });
+    
+    // 加载保存的设置
+    document.addEventListener('DOMContentLoaded', () => {
+        // 加载字体大小
+        const savedFontSize = localStorage.getItem('fontSize');
+        if (savedFontSize) {
+            fontSize = parseInt(savedFontSize);
+            content.style.fontSize = fontSize + 'px';
+        }
+        
+        // 加载主题设置
+        const isDark = localStorage.getItem('darkTheme') === 'true';
+        if (isDark) {
+            body.classList.add('dark-theme');
+            themeButton.textContent = '☀';
+        }
+    });
+</script>
+{% endblock %}

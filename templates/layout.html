@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}小说网站{% endblock %}</title>
+    <style>
+        :root {
+            --primary-color: #bf2c24;
+            --primary-hover: #d4382f;
+            --text-color: #333;
+            --text-light: #666;
+            --bg-color: #f6f7f9;
+            --border-color: #e5e6eb;
+        }
+        body {
+            font-family: 'Microsoft YaHei', PingFang SC, -apple-system, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        header {
+            background-color: #fff;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px 20px;
+            box-sizing: border-box;
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-right: 25px;
+            font-size: 1.1em;
+        }
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-form input {
+            padding: 8px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            width: 240px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .search-form input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            width: 300px;
+        }
+        .search-form button {
+            padding: 8px 20px;
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .search-form button:hover {
+            background-color: var(--primary-hover);
+        }
+        {% block styles %}{% endblock %}
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="nav-left">
+                <a href="/" class="logo">小说网站</a>
+                <div class="nav-links">
+                    <a href="/">首页</a>
+                    <a href="#">分类</a>
+                    <a href="#">排行</a>
+                    <a href="#">完本</a>
+                    <a href="/recent-reads" id="recent-reads">最近阅读</a>
+                </div>
+            </div>
+            <form class="search-form" action="/search" method="get">
+                <input type="text" name="q" placeholder="搜索书名或作者..." value="{{ query if query else '' }}">
+                <button type="submit">搜索</button>
+            </form>
+        </nav>
+    </header>
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

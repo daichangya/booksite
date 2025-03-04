@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}最近阅读 - 小说网站{% endblock %}
+
+{% block styles %}
+<style>
+    .recent-reads {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        margin-top: 20px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    }
+    .section-title {
+        font-size: 24px;
+        color: var(--text-color);
+        margin: 0 0 30px;
+        padding-left: 12px;
+        border-left: 4px solid var(--primary-color);
+    }
+    .read-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .read-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        background: var(--bg-color);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    .read-item:hover {
+        transform: translateX(5px);
+        background: #f0f1f3;
+    }
+    .book-info {
+        flex: 1;
+    }
+    .book-title {
+        font-size: 16px;
+        font-weight: bold;
+        color: var(--text-color);
+        margin: 0 0 5px;
+    }
+    .chapter-info {
+        font-size: 14px;
+        color: var(--text-light);
+    }
+    .continue-reading {
+        padding: 8px 20px;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 20px;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+    .continue-reading:hover {
+        background-color: var(--primary-hover);
+    }
+    .no-records {
+        text-align: center;
+        padding: 40px;
+        color: var(--text-light);
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recent-reads">
+    <h1 class="section-title">最近阅读</h1>
+    <div id="readList" class="read-list">
+        <!-- 阅读记录将通过JavaScript动态插入 -->
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const readList = document.getElementById('readList');
+        const recentReads = JSON.parse(localStorage.getItem('recentReads') || '[]');
+
+        if (recentReads.length === 0) {
+            readList.innerHTML = '<div class="no-records">暂无阅读记录</div>';
+            return;
+        }
+
+        readList.innerHTML = recentReads.map(book => `
+            <div class="read-item">
+                <div class="book-info">
+                    <h3 class="book-title">${book.title}</h3>
+                    <div class="chapter-info">上次阅读：${book.chapterTitle}</div>
+                </div>
+                <a href="/book/${book.id}/chapter/${book.chapterId}" class="continue-reading">继续阅读</a>
+            </div>
+        `).join('');
+    });
+</script>
+{% endblock %}
